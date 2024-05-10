@@ -235,6 +235,29 @@
         </inertial>
   </link>
 
+<!-- hokuyo_sensor -->
+  <link name="hokuyo_sensor">
+        <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <mesh filename="package://barista_robot_description/meshes/hokuyo_ust_10lx.dae" scale="1 1 1"/>
+        </geometry>
+      <material name="black"/>
+        </visual>
+         <inertial>
+            <mass value="0.160"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="0.000099" ixy="0" ixz="0" iyy="0.000099" iyz="0" izz="0.000066"/>
+        </inertial>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.050 0.050 0.070"/>
+            </geometry>
+        </collision>
+    </link>
+
+
 
 <!-- joints -->
   <joint name="base_link_to_rod_a" type="fixed">
@@ -264,7 +287,7 @@
   <joint name="base_link_to_right_wheel" type="continuous">
     <parent link="base_link"/>
     <child link="right_wheel"/>
-    <origin xyz="0 0.145 -0.0775" rpy="0 0 0"/>
+    <origin xyz="0 -0.145 -0.0775" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
     <limit effort="10000" velocity="1000" />
     <joint_properties damping="1.0" friction="1.0"/>
@@ -273,7 +296,7 @@
   <joint name="base_link_to_left_wheel" type="continuous">
     <parent link="base_link"/>
     <child link="left_wheel"/>
-    <origin xyz="0 -0.145 -0.0775" rpy="0 0 0"/>
+    <origin xyz="0 0.145 -0.0775" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
     <limit effort="10000" velocity="1000" />
     <joint_properties damping="1.0" friction="1.0"/>
@@ -296,10 +319,16 @@
   </joint> 
 
   <joint name="base_link_to_cup_holder" type="fixed">
-  <parent link="base_link"/>
-  <child link="cup_holder"/>
-  <origin xyz="0 0 0.330" rpy="0 0 0"/>
-</joint>
+    <parent link="base_link"/>
+    <child link="cup_holder"/>
+    <origin xyz="0 0 0.330" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="base_link_to_hokuyo_sensor" type="fixed">
+    <origin xyz="0.130 0 0.0775" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="hokuyo_sensor"/>
+  </joint>
 
 
     <!-- Joint State Plugin -->
@@ -332,6 +361,36 @@
             <robot_base_frame>base_link</robot_base_frame>
         </plugin>
     </gazebo>
+
+    <!-- hokuyo_sensor_plugin -->
+    <gazebo reference="hokuyo_sensor">
+    <sensor name="sensor_ray" type="ray">
+        <pose>0 0 0 0 0 0</pose>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>720</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-3.14</min_angle>
+              <max_angle>3.14</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.1</min>
+            <max>5.0</max>
+          </range>
+        </ray>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>100.0</update_rate>
+        <plugin name="laser" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <remapping>~/out:=scan</remapping>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+        </plugin>
+      </sensor>
+	</gazebo>
 
 <!-- gazebo_references -->
 <gazebo reference="base_link">
@@ -385,6 +444,9 @@
     </gazebo>
 <gazebo reference="base_link_to_back_caster">
         <preserveFixedJoint>true</preserveFixedJoint>
-    </gazebo>    
+    </gazebo>  
+<gazebo reference="hokuyo_sensor">
+        <material>Gazebo/Black</material>
+  </gazebo>      
 
 </robot>
