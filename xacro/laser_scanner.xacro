@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  
+  <xacro:macro name="laser_scanner" params="include_laser:=true">
+    <xacro:if value="${include_laser}">
+      <link name="hokuyo_sensor">
+          <visual>
+          <origin rpy="0 0 0" xyz="0 0 -0.0025" />
+              <geometry>
+                  <mesh filename="package://barista_robot_description/meshes/hokuyo_ust_10lx.dae" scale="1 1 1"/>
+              </geometry>
+          </visual>
+      </link>
+
+      <joint name="hokuyo_sensor_to_base_link" type="fixed">
+          <origin rpy="0 0 0" xyz="0.130 0 0.0775" />
+          <parent link="base_link" />
+          <child link="hokuyo_sensor" />
+      </joint>
+
+      <gazebo reference="hokuyo_sensor">
+          <material>Gazebo/Black</material>
+      </gazebo>
+
+    <gazebo reference="hokuyo_sensor">
+      <sensor name="ray" type="ray">
+          <pose>0 0 0 0 0 0</pose>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>720</samples>
+                <resolution>1.0</resolution>
+                <min_angle>-3.14</min_angle>
+                <max_angle>3.14</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.1</min>
+              <max>5.0</max>
+            </range>
+          </ray>
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>100.0</update_rate>
+          <plugin name="laser" filename="libgazebo_ros_ray_sensor.so">
+            <ros>
+              <remapping>~/out:=scan</remapping>
+            </ros>
+            <output_type>sensor_msgs/LaserScan</output_type>
+          </plugin>
+      </sensor>
+    </gazebo>
+
+    </xacro:if>
+  </xacro:macro>
+
+</robot>

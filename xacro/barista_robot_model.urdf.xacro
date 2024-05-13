@@ -5,6 +5,7 @@
 <xacro:include filename="$(find barista_robot_description)/xacro/standoff.xacro" />
 <xacro:include filename="$(find barista_robot_description)/xacro/caster.xacro" />
 <xacro:include filename="$(find barista_robot_description)/xacro/cup_holder_tray.xacro" />
+<xacro:include filename="$(find barista_robot_description)/xacro/laser_scanner.xacro" />
 
 <xacro:property name="base_link_radius" value="0.178"/>
 <xacro:property name="base_link_length" value="0.155"/>
@@ -118,6 +119,9 @@
   </joint>
 
 
+  <xacro:laser_scanner include_laser="True" />
+
+
 <!-- gazebo references -->
   <gazebo reference="right_wheel">
         <kp>1e6</kp>
@@ -170,6 +174,32 @@
     </gazebo>
 <gazebo reference="base_link_to_back_caster">
         <preserveFixedJoint>true</preserveFixedJoint>
-    </gazebo>  
+    </gazebo>
+
+ <!-- Differential drive -->
+  <gazebo>
+    <plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
+
+      <!-- wheels -->
+      <left_joint>base_link_to_left_wheel</left_joint>
+      <right_joint>base_link_to_right_wheel</right_joint>
+
+      <!-- kinematics -->
+      <wheel_separation>0.3</wheel_separation>
+      <wheel_diameter>0.0704</wheel_diameter>
+
+      <!-- limits -->
+      <max_wheel_torque>1.0</max_wheel_torque>
+      <max_wheel_acceleration>2.0</max_wheel_acceleration>
+
+      <!-- output -->
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+
+    </plugin>
+  </gazebo>    
 
 </robot>   
